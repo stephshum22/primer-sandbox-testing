@@ -24,7 +24,7 @@ export default async function handler(
     const response = await axios.get(primerApiUrl, {
       headers: {
         'X-Api-Version': '2.4',
-        'Authorization': `Bearer ${apiKey}`,
+        'X-Api-Key': apiKey,
       },
     });
 

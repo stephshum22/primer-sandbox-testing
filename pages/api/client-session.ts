@@ -25,28 +25,37 @@ export default async function handler(
       });
     }
 
+    // Correct request format based on Primer docs
+    const requestBody = {
+      orderId,
+      currencyCode,
+      amount: amount,
+      order: {
+        lineItems: [
+          {
+            itemId: 'test-item',
+            description: 'Test Product',
+            amount: amount,
+            quantity: 1,
+          },
+        ],
+      },
+    };
+
+    console.log('Making request to:', primerApiUrl);
+    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+    console.log('API Key (first 20 chars):', apiKey.substring(0, 20) + '...');
+
     const response = await axios.post(
       primerApiUrl,
-      {
-        orderId,
-        order: {
-          currencyCode,
-          lineItems: [
-            {
-              itemId: 'test-item',
-              description: 'Test Product',
-              amount: amount,
-              quantity: 1,
-            },
-          ],
-        },
-      },
+      requestBody,
       {
         headers: {
           'X-Api-Version': '2.4',
-          'Authorization': `Bearer ${apiKey}`,
+          'X-Api-Key': apiKey,
           'Content-Type': 'application/json',
         },
+        timeout: 10000, // 10 second timeout
       }
     );
 

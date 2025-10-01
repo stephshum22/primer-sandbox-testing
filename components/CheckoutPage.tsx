@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Primer } from '@primer-io/checkout-web';
+import React, { useState, useEffect, useRef } from 'react';
+import { loadPrimer } from '@primer-io/checkout-web';
+
+// Declare Primer global
+declare global {
+  interface Window {
+    Primer: any;
+  }
+}
 
 interface CartItem {
   product: {
@@ -23,24 +30,76 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
   const [clientToken, setClientToken] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [isClient, setIsClient] = useState(false);
+  const primerRef = useRef<HTMLDivElement>(null);
+
+  // Ensure we're on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Initialize Primer checkout
   useEffect(() => {
+    if (!isClient || !clientToken) return;
+    
     const initializeCheckout = async () => {
       try {
-        // In a real implementation, you'd get this from your backend
-        // For sandbox, you can use Primer's test client token
-        const token = await fetchClientToken();
-        setClientToken(token);
-        setIsLoading(false);
-      } catch (err) {
-        setError('Failed to initialize checkout');
+        console.log('Loading Primer SDK...');
+        await loadPrimer();
+        console.log('Primer SDK loaded successfully');
+        
+        if (window.Primer && primerRef.current) {
+          console.log('Initializing Primer checkout...');
+          window.Primer.showUniversalCheckout({
+            clientToken: clientToken,
+            container: primerRef.current,
+            onCheckoutComplete: handlePaymentSuccess,
+            onCheckoutError: handlePaymentError,
+            appearance: {
+              theme: 'light',
+              variables: {
+                colorPrimary: '#007bff',
+                colorBackground: '#ffffff',
+                colorText: '#333333',
+                borderRadius: '8px',
+              },
+            },
+          });
+          console.log('Primer checkout initialized successfully');
+          setIsLoading(false);
+        } else {
+          console.error('Missing requirements for Primer checkout');
+          setError('Failed to initialize Primer checkout');
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Error loading Primer SDK:', error);
+        setError('Failed to load Primer SDK');
         setIsLoading(false);
       }
     };
 
     initializeCheckout();
-  }, []);
+  }, [isClient, clientToken]);
+
+  // Get client token
+  useEffect(() => {
+    if (!isClient) return;
+    
+    const getToken = async () => {
+      try {
+        const token = await fetchClientToken();
+        setClientToken(token);
+        console.log('Client token obtained:', token.substring(0, 20) + '...');
+      } catch (err) {
+        console.error('Failed to get client token:', err);
+        setError('Failed to initialize checkout');
+        setIsLoading(false);
+      }
+    };
+
+    getToken();
+  }, [isClient]);
 
   const fetchClientToken = async (): Promise<string> => {
     // This would typically come from your backend API
@@ -78,7 +137,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
     alert('Payment failed. Check console for details.');
   };
 
-  if (isLoading) {
+  if (!isClient || isLoading) {
     return (
       <div className="checkout-page">
         <div className="container">
@@ -150,26 +209,13 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
 
           <div className="payment-section">
             <h3>Payment Details</h3>
-            {clientToken ? (
-              <Primer
-                clientToken={clientToken}
-                onCheckoutComplete={handlePaymentSuccess}
-                onCheckoutError={handlePaymentError}
-                appearance={{
-                  theme: 'light',
-                  variables: {
-                    colorPrimary: '#007bff',
-                    colorBackground: '#ffffff',
-                    colorText: '#333333',
-                    borderRadius: '8px',
-                  },
-                }}
-              />
-            ) : (
-              <div className="payment-loading">
-                <p>Loading payment form...</p>
-              </div>
-            )}
+            <div ref={primerRef} className="primer-checkout-container">
+              {isLoading && (
+                <div className="payment-loading">
+                  <p>Loading Primer checkout...</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
