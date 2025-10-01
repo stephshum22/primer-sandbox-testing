@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { loadPrimer } from '@primer-io/checkout-web';
+import Script from 'next/script';
 
 // Declare Primer global
 declare global {
@@ -31,6 +31,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
+  const [primerLoaded, setPrimerLoaded] = useState(false);
   const primerRef = useRef<HTMLDivElement>(null);
 
   // Ensure we're on the client side
@@ -38,18 +39,17 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
     setIsClient(true);
   }, []);
 
-  // Initialize Primer checkout
+  // Initialize Primer checkout when both client and SDK are ready
   useEffect(() => {
-    if (!isClient || !clientToken) return;
+    if (!isClient || !primerLoaded || !clientToken) return;
     
-    const initializeCheckout = async () => {
-      try {
-        console.log('Loading Primer SDK...');
-        await loadPrimer();
-        console.log('Primer SDK loaded successfully');
-        
-        if (window.Primer && primerRef.current) {
-          console.log('Initializing Primer checkout...');
+    const initializePrimerCheckout = () => {
+      console.log('Initializing Primer checkout...');
+      console.log('Window.Primer available:', !!window.Primer);
+      console.log('PrimerRef current:', !!primerRef.current);
+      
+      if (window.Primer && primerRef.current) {
+        try {
           window.Primer.showUniversalCheckout({
             clientToken: clientToken,
             container: primerRef.current,
@@ -67,20 +67,23 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
           });
           console.log('Primer checkout initialized successfully');
           setIsLoading(false);
-        } else {
-          console.error('Missing requirements for Primer checkout');
+        } catch (error) {
+          console.error('Error initializing Primer checkout:', error);
           setError('Failed to initialize Primer checkout');
           setIsLoading(false);
         }
-      } catch (error) {
-        console.error('Error loading Primer SDK:', error);
+      } else {
+        console.error('Missing requirements for Primer checkout:', {
+          windowPrimer: !!window.Primer,
+          primerRef: !!primerRef.current
+        });
         setError('Failed to load Primer SDK');
         setIsLoading(false);
       }
     };
 
-    initializeCheckout();
-  }, [isClient, clientToken]);
+    initializePrimerCheckout();
+  }, [isClient, primerLoaded, clientToken]);
 
   // Get client token
   useEffect(() => {
@@ -173,6 +176,19 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
 
   return (
     <div className="checkout-page">
+      <Script
+        src="https://sdk.primer.io/web/v1.41.1/Primer.min.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          console.log('Primer SDK loaded successfully');
+          setPrimerLoaded(true);
+        }}
+        onError={() => {
+          console.error('Failed to load Primer SDK');
+          setError('Failed to load Primer SDK');
+          setIsLoading(false);
+        }}
+      />
       <div className="container">
         <div className="checkout-header">
           <button className="back-btn" onClick={onBackToProducts}>
