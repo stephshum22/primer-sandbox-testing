@@ -42,10 +42,6 @@ export default async function handler(
       },
     };
 
-    console.log('Making request to:', primerApiUrl);
-    console.log('Request body:', JSON.stringify(requestBody, null, 2));
-    console.log('API Key (first 20 chars):', apiKey.substring(0, 20) + '...');
-
     const response = await axios.post(
       primerApiUrl,
       requestBody,

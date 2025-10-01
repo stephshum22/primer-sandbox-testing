@@ -47,27 +47,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
     // Add a small delay to ensure DOM is fully rendered
     const timeoutId = setTimeout(() => {
       const initializePrimerCheckout = () => {
-        console.log('Initializing Primer checkout...');
-        console.log('Window.Primer available:', !!window.Primer);
-        
-        // Debug: Check what elements exist in the DOM
-        console.log('All elements with class containing "primer":', 
-          document.querySelectorAll('[class*="primer"]'));
-        console.log('All elements with class containing "checkout":', 
-          document.querySelectorAll('[class*="checkout"]'));
-        console.log('Payment section element:', 
-          document.querySelector('.payment-section'));
-        
-        // Check if elements exist by ID or other selectors
-        console.log('All divs:', document.querySelectorAll('div'));
-        console.log('All elements with payment-section class:', 
-          document.querySelectorAll('.payment-section'));
-        console.log('All elements with primer-checkout-container class:', 
-          document.querySelectorAll('.primer-checkout-container'));
-        
-        // Use document.querySelector instead of ref for more reliable DOM access
         const container = document.querySelector('.primer-checkout-container');
-        console.log('Container element found:', !!container);
       
       if (window.Primer && container) {
         try {
@@ -76,39 +56,17 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
             onCheckoutComplete: handlePaymentSuccess,
             onCheckoutFail: handlePaymentError,
           });
-          console.log('Primer checkout initialized successfully');
-          setIsLoading(false);
         } catch (error) {
           console.error('Error initializing Primer checkout:', error);
           setError('Failed to initialize Primer checkout');
-          setIsLoading(false);
         }
-      } else {
-        console.error('Missing requirements for Primer checkout:', {
-          windowPrimer: !!window.Primer,
-          container: !!container
-        });
-        
-        // Wait a bit and try again if DOM element isn't ready
-        if (window.Primer && !container) {
-          console.log('DOM element not ready, retrying in 1000ms...');
-          setTimeout(() => {
-            const retryContainer = document.querySelector('.primer-checkout-container');
-            console.log('Retry - Container element found:', !!retryContainer);
-            
-            if (retryContainer) {
-              console.log('DOM element found on retry, initializing...');
-              initializePrimerCheckout();
-            } else {
-              console.error('DOM element still not found after retry');
-              setError('Failed to load Primer SDK - DOM element not found');
-              setIsLoading(false);
-            }
-          }, 1000);
-        } else {
-          setError('Failed to load Primer SDK');
-          setIsLoading(false);
-        }
+      } else if (window.Primer && !container) {
+        // Retry if DOM element isn't ready yet
+        setTimeout(() => {
+          if (document.querySelector('.primer-checkout-container')) {
+            initializePrimerCheckout();
+          }
+        }, 1000);
       }
     };
 
@@ -126,32 +84,22 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
       try {
         const token = await fetchClientToken();
         setClientToken(token);
-        console.log('Client token obtained:', token.substring(0, 20) + '...');
         
         // If Script component didn't load SDK, try manual loading
         setTimeout(() => {
           if (!window.Primer) {
-            console.log('Script component failed, trying manual SDK loading...');
             const script = document.createElement('script');
-            script.src = 'https://sdk.primer.io/web/v1.41.1/Primer.min.js';
+            script.src = 'https://sdk.primer.io/web/v2.57.3/Primer.min.js';
             script.async = true;
-            script.onload = () => {
-              console.log('Manual SDK loading successful');
-              setPrimerLoaded(true);
-            };
-            script.onerror = () => {
-              console.error('Manual SDK loading failed');
-              setError('Failed to load Primer SDK');
-              setIsLoading(false);
-            };
+            script.onload = () => setPrimerLoaded(true);
+            script.onerror = () => setError('Failed to load Primer SDK');
             document.head.appendChild(script);
           }
-        }, 2000); // Wait 2 seconds for Script component
+        }, 2000);
         
       } catch (err) {
         console.error('Failed to get client token:', err);
         setError('Failed to initialize checkout');
-        setIsLoading(false);
       }
     };
 
@@ -234,22 +182,13 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
     );
   }
 
-  console.log('CheckoutPage rendering with:', { isClient, primerLoaded, clientToken, isLoading, error });
-
   return (
     <div className="checkout-page">
       <Script
         src="https://sdk.primer.io/web/v2.57.3/Primer.min.js"
         strategy="afterInteractive"
-        onLoad={() => {
-          console.log('Primer SDK loaded successfully');
-          setPrimerLoaded(true);
-        }}
-        onError={() => {
-          console.error('Failed to load Primer SDK');
-          setError('Failed to load Primer SDK');
-          setIsLoading(false);
-        }}
+        onLoad={() => setPrimerLoaded(true)}
+        onError={() => setError('Failed to load Primer SDK')}
       />
       <div className="container">
         <div className="checkout-header">
@@ -287,24 +226,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
 
           <div className="payment-section">
             <h3>Payment Details</h3>
-            <div className="primer-checkout-container">
-              {isLoading && (
-                <div className="payment-loading">
-                  <p>Loading Primer checkout...</p>
-                </div>
-              )}
-            </div>
-            <div style={{marginTop: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '5px'}}>
-              <strong>Debug Info:</strong><br/>
-              isClient: {isClient ? 'true' : 'false'}<br/>
-              primerLoaded: {primerLoaded ? 'true' : 'false'}<br/>
-              clientToken: {clientToken ? 'present' : 'missing'}<br/>
-              isLoading: {isLoading ? 'true' : 'false'}
-            </div>
-            <div style={{marginTop: '10px', padding: '10px', background: '#ff0000', color: 'white', borderRadius: '5px'}}>
-              <strong>TEST ELEMENT - This should be visible!</strong><br/>
-              If you can see this red box, the CheckoutPage is rendering correctly.
-            </div>
+            <div className="primer-checkout-container"></div>
           </div>
         </div>
 

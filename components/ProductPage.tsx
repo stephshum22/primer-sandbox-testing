@@ -98,18 +98,13 @@ const ProductPage: React.FC = () => {
   };
 
   const handleProceedToCheckout = () => {
-    console.log('handleProceedToCheckout called');
-    // Skip the CheckoutForm and go directly to Primer
-    // Generate minimal checkout data as recommended by Primer docs
     const checkoutData = {
       orderId: 'order-' + Date.now(),
       amount: Math.round(getTotalPrice() * 100), // Convert to cents
       currencyCode: 'USD',
     };
-    console.log('Generated checkout data:', checkoutData);
     setCheckoutData(checkoutData);
     setShowPrimerCheckout(true);
-    console.log('State updated - should show CheckoutPage');
   };
 
   const handleBackToProducts = () => {
@@ -117,14 +112,7 @@ const ProductPage: React.FC = () => {
     setCheckoutData(null);
   };
 
-  console.log('ProductPage render state:', { 
-    showPrimerCheckout, 
-    checkoutData: !!checkoutData, 
-    cartLength: cart.length 
-  });
-
   if (showPrimerCheckout && checkoutData) {
-    console.log('Rendering CheckoutPage with data:', checkoutData);
     return (
       <CheckoutPage 
         cart={cart}
