@@ -37,6 +37,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
   // Ensure we're on the client side
   useEffect(() => {
     setIsClient(true);
+    setIsLoading(false); // Show the checkout form immediately
   }, []);
 
   // Initialize Primer checkout when both client and SDK are ready
@@ -199,7 +200,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
     }
   };
 
-  if (!isClient || isLoading) {
+  if (!isClient) {
     return (
       <div className="checkout-page">
         <div className="container">
