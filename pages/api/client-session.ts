@@ -25,13 +25,12 @@ export default async function handler(
       });
     }
 
-    // Complete request format with collected user data
+    // Simplified request format based on Primer docs example
     const requestBody = {
       orderId,
       currencyCode,
       amount: amount,
       order: {
-        countryCode: billingAddress?.countryCode || 'US',
         lineItems: [
           {
             itemId: 'test-item',
@@ -40,24 +39,6 @@ export default async function handler(
             quantity: 1,
           },
         ],
-      },
-      customer: {
-        emailAddress: customerEmail || 'test@example.com',
-        firstName: customerName?.split(' ')[0] || 'John',
-        lastName: customerName?.split(' ')[1] || 'Doe',
-        billingAddress: billingAddress ? {
-          firstName: billingAddress.firstName,
-          lastName: billingAddress.lastName,
-          addressLine1: billingAddress.addressLine1,
-          city: billingAddress.city,
-          state: billingAddress.state,
-          postalCode: billingAddress.zipCode,
-          countryCode: billingAddress.countryCode,
-        } : undefined,
-      },
-      metadata: {
-        source: 'sandbox-testing',
-        environment: 'development',
       },
     };
 
