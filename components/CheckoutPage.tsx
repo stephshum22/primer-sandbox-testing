@@ -23,10 +23,11 @@ interface CartItem {
 interface CheckoutPageProps {
   cart: CartItem[];
   totalPrice: number;
+  checkoutData: any;
   onBackToProducts: () => void;
 }
 
-const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToProducts }) => {
+const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutData, onBackToProducts }) => {
   const [clientToken, setClientToken] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -140,18 +141,19 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
   }, [isClient]);
 
   const fetchClientToken = async (): Promise<string> => {
-    // This would typically come from your backend API
-    // For sandbox testing, you can use Primer's test credentials
+    // Use the checkout data collected from the form
     const response = await fetch('/api/client-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        // Add any order details here
-        orderId: 'test-order-' + Date.now(),
-        amount: Math.round(totalPrice * 100), // Convert to cents
-        currencyCode: 'USD',
+        orderId: checkoutData.orderId,
+        amount: checkoutData.amount,
+        currencyCode: checkoutData.currencyCode,
+        customerEmail: checkoutData.customerEmail,
+        customerName: checkoutData.customerName,
+        billingAddress: checkoutData.billingAddress,
       }),
     });
 

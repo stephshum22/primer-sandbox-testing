@@ -11,7 +11,7 @@ export default async function handler(
   }
 
   try {
-    const { orderId, amount, currencyCode } = req.body;
+    const { orderId, amount, currencyCode, customerEmail, customerName, billingAddress } = req.body;
 
     // Primer sandbox API endpoint
     const primerApiUrl = 'https://api.sandbox.primer.io/client-session';
@@ -25,13 +25,13 @@ export default async function handler(
       });
     }
 
-    // Complete request format based on Primer API docs
+    // Complete request format with collected user data
     const requestBody = {
       orderId,
       currencyCode,
       amount: amount,
       order: {
-        countryCode: 'US',
+        countryCode: billingAddress?.countryCode || 'US',
         lineItems: [
           {
             itemId: 'test-item',
@@ -42,7 +42,18 @@ export default async function handler(
         ],
       },
       customer: {
-        emailAddress: 'test@example.com',
+        emailAddress: customerEmail || 'test@example.com',
+        firstName: customerName?.split(' ')[0] || 'John',
+        lastName: customerName?.split(' ')[1] || 'Doe',
+        billingAddress: billingAddress ? {
+          firstName: billingAddress.firstName,
+          lastName: billingAddress.lastName,
+          addressLine1: billingAddress.addressLine1,
+          city: billingAddress.city,
+          state: billingAddress.state,
+          zipCode: billingAddress.zipCode,
+          countryCode: billingAddress.countryCode,
+        } : undefined,
       },
       metadata: {
         source: 'sandbox-testing',

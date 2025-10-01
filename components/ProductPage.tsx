@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CheckoutForm from './CheckoutForm';
 import CheckoutPage from './CheckoutPage';
 
 interface Product {
@@ -17,7 +18,9 @@ interface CartItem {
 
 const ProductPage: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [showCheckout, setShowCheckout] = useState(false);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [showPrimerCheckout, setShowPrimerCheckout] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<any>(null);
 
   // Sample products
   const products: Product[] = [
@@ -96,12 +99,40 @@ const ProductPage: React.FC = () => {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
-  if (showCheckout) {
+  const handleProceedToCheckout = () => {
+    setShowCheckoutForm(true);
+  };
+
+  const handleProceedToPrimer = (data: any) => {
+    setCheckoutData(data);
+    setShowCheckoutForm(false);
+    setShowPrimerCheckout(true);
+  };
+
+  const handleBackToProducts = () => {
+    setShowCheckoutForm(false);
+    setShowPrimerCheckout(false);
+    setCheckoutData(null);
+  };
+
+  if (showPrimerCheckout && checkoutData) {
     return (
       <CheckoutPage 
         cart={cart}
         totalPrice={getTotalPrice()}
-        onBackToProducts={() => setShowCheckout(false)}
+        checkoutData={checkoutData}
+        onBackToProducts={handleBackToProducts}
+      />
+    );
+  }
+
+  if (showCheckoutForm) {
+    return (
+      <CheckoutForm 
+        cart={cart}
+        totalPrice={getTotalPrice()}
+        onProceedToPrimer={handleProceedToPrimer}
+        onBackToProducts={handleBackToProducts}
       />
     );
   }
@@ -125,7 +156,7 @@ const ProductPage: React.FC = () => {
               <span className="cart-total">${getTotalPrice().toFixed(2)}</span>
               <button 
                 className="checkout-btn"
-                onClick={() => setShowCheckout(true)}
+                onClick={handleProceedToCheckout}
               >
                 Proceed to Checkout
               </button>
@@ -208,7 +239,7 @@ const ProductPage: React.FC = () => {
             </div>
             <button 
               className="checkout-btn-large"
-              onClick={() => setShowCheckout(true)}
+              onClick={handleProceedToCheckout}
             >
               Checkout with Primer
             </button>

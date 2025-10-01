@@ -34,8 +34,8 @@ PRIMER_API_KEY=your_sandbox_api_key_here
 ```bash
 npm run dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) to see the checkout page.
+(http://localhost:3000
+Open [http://localhost:3000]) to see the checkout page.
 
 ## Testing
 
