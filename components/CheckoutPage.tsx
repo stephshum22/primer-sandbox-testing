@@ -63,20 +63,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
       
       if (window.Primer && container) {
         try {
-          window.Primer.showUniversalCheckout({
-            clientToken: clientToken,
-            container: container,
+          window.Primer.showUniversalCheckout(clientToken, {
+            container: '.primer-checkout-container',
             onCheckoutComplete: handlePaymentSuccess,
-            onCheckoutError: handlePaymentError,
-            appearance: {
-              theme: 'light',
-              variables: {
-                colorPrimary: '#007bff',
-                colorBackground: '#ffffff',
-                colorText: '#333333',
-                borderRadius: '8px',
-              },
-            },
+            onCheckoutFail: handlePaymentError,
           });
           console.log('Primer checkout initialized successfully');
           setIsLoading(false);
@@ -185,16 +175,21 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
     return data.clientToken;
   };
 
-  const handlePaymentSuccess = (payment: any) => {
-    console.log('Payment successful:', payment);
+  const handlePaymentSuccess = ({ payment }: any) => {
+    console.log('Checkout Complete!', payment);
     // Handle successful payment
     alert('Payment successful! Check console for details.');
   };
 
-  const handlePaymentError = (error: any) => {
-    console.error('Payment error:', error);
+  const handlePaymentError = (error: any, { payment }: any, handler: any) => {
+    console.log('Checkout Fail!', error, payment);
     // Handle payment error
     alert('Payment failed. Check console for details.');
+    
+    // If handler exists, show error message
+    if (handler) {
+      handler.showErrorMessage();
+    }
   };
 
   if (!isClient || isLoading) {

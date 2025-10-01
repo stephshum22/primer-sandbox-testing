@@ -25,7 +25,7 @@ export default async function handler(
       });
     }
 
-    // Simplified request format based on Primer docs example
+    // Request format matching Primer docs exactly
     const requestBody = {
       orderId,
       currencyCode,
@@ -34,11 +34,11 @@ export default async function handler(
         lineItems: [
           {
             itemId: 'test-item',
-            description: 'Test Product',
             amount: amount,
             quantity: 1,
           },
         ],
+        countryCode: 'US',
       },
     };
 
