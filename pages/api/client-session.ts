@@ -51,7 +51,7 @@ export default async function handler(
           addressLine1: billingAddress.addressLine1,
           city: billingAddress.city,
           state: billingAddress.state,
-          zipCode: billingAddress.zipCode,
+          postalCode: billingAddress.zipCode,
           countryCode: billingAddress.countryCode,
         } : undefined,
       },
