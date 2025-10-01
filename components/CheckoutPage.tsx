@@ -57,6 +57,13 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
         console.log('Payment section element:', 
           document.querySelector('.payment-section'));
         
+        // Check if elements exist by ID or other selectors
+        console.log('All divs:', document.querySelectorAll('div'));
+        console.log('All elements with payment-section class:', 
+          document.querySelectorAll('.payment-section'));
+        console.log('All elements with primer-checkout-container class:', 
+          document.querySelectorAll('.primer-checkout-container'));
+        
         // Use document.querySelector instead of ref for more reliable DOM access
         const container = document.querySelector('.primer-checkout-container');
         console.log('Container element found:', !!container);
@@ -292,6 +299,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
               primerLoaded: {primerLoaded ? 'true' : 'false'}<br/>
               clientToken: {clientToken ? 'present' : 'missing'}<br/>
               isLoading: {isLoading ? 'true' : 'false'}
+            </div>
+            <div style={{marginTop: '10px', padding: '10px', background: '#ff0000', color: 'white', borderRadius: '5px'}}>
+              <strong>TEST ELEMENT - This should be visible!</strong><br/>
+              If you can see this red box, the CheckoutPage is rendering correctly.
             </div>
           </div>
         </div>
