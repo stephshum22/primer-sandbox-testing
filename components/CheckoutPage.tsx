@@ -43,13 +43,23 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
   useEffect(() => {
     if (!isClient || !primerLoaded || !clientToken) return;
     
-    const initializePrimerCheckout = () => {
-      console.log('Initializing Primer checkout...');
-      console.log('Window.Primer available:', !!window.Primer);
-      
-      // Use document.querySelector instead of ref for more reliable DOM access
-      const container = document.querySelector('.primer-checkout-container');
-      console.log('Container element found:', !!container);
+    // Add a small delay to ensure DOM is fully rendered
+    const timeoutId = setTimeout(() => {
+      const initializePrimerCheckout = () => {
+        console.log('Initializing Primer checkout...');
+        console.log('Window.Primer available:', !!window.Primer);
+        
+        // Debug: Check what elements exist in the DOM
+        console.log('All elements with class containing "primer":', 
+          document.querySelectorAll('[class*="primer"]'));
+        console.log('All elements with class containing "checkout":', 
+          document.querySelectorAll('[class*="checkout"]'));
+        console.log('Payment section element:', 
+          document.querySelector('.payment-section'));
+        
+        // Use document.querySelector instead of ref for more reliable DOM access
+        const container = document.querySelector('.primer-checkout-container');
+        console.log('Container element found:', !!container);
       
       if (window.Primer && container) {
         try {
@@ -104,7 +114,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
       }
     };
 
-    initializePrimerCheckout();
+      initializePrimerCheckout();
+    }, 500); // Wait 500ms for DOM to be ready
+    
+    return () => clearTimeout(timeoutId);
   }, [isClient, primerLoaded, clientToken]);
 
   // Get client token and load SDK
