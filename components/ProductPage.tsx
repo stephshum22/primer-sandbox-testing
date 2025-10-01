@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import CheckoutForm from './CheckoutForm';
 import CheckoutPage from './CheckoutPage';
 
 interface Product {
@@ -18,7 +17,6 @@ interface CartItem {
 
 const ProductPage: React.FC = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [showPrimerCheckout, setShowPrimerCheckout] = useState(false);
   const [checkoutData, setCheckoutData] = useState<any>(null);
 
@@ -100,17 +98,18 @@ const ProductPage: React.FC = () => {
   };
 
   const handleProceedToCheckout = () => {
-    setShowCheckoutForm(true);
-  };
-
-  const handleProceedToPrimer = (data: any) => {
-    setCheckoutData(data);
-    setShowCheckoutForm(false);
+    // Skip the CheckoutForm and go directly to Primer
+    // Generate minimal checkout data as recommended by Primer docs
+    const checkoutData = {
+      orderId: 'order-' + Date.now(),
+      amount: Math.round(getTotalPrice() * 100), // Convert to cents
+      currencyCode: 'USD',
+    };
+    setCheckoutData(checkoutData);
     setShowPrimerCheckout(true);
   };
 
   const handleBackToProducts = () => {
-    setShowCheckoutForm(false);
     setShowPrimerCheckout(false);
     setCheckoutData(null);
   };
@@ -121,17 +120,6 @@ const ProductPage: React.FC = () => {
         cart={cart}
         totalPrice={getTotalPrice()}
         checkoutData={checkoutData}
-        onBackToProducts={handleBackToProducts}
-      />
-    );
-  }
-
-  if (showCheckoutForm) {
-    return (
-      <CheckoutForm 
-        cart={cart}
-        totalPrice={getTotalPrice()}
-        onProceedToPrimer={handleProceedToPrimer}
         onBackToProducts={handleBackToProducts}
       />
     );
