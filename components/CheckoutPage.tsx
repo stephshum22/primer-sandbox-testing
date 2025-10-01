@@ -81,15 +81,32 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
         
         // Wait a bit and try again if DOM element isn't ready
         if (window.Primer && !primerRef.current) {
-          console.log('DOM element not ready, retrying in 500ms...');
+          console.log('DOM element not ready, retrying in 1000ms...');
           setTimeout(() => {
-            if (primerRef.current) {
+            // Check if element exists in DOM
+            const element = document.querySelector('.primer-checkout-container');
+            console.log('DOM element found:', !!element);
+            console.log('PrimerRef current:', !!primerRef.current);
+            
+            if (primerRef.current || element) {
+              console.log('DOM element found on retry, initializing...');
               initializePrimerCheckout();
             } else {
-              setError('Failed to load Primer SDK - DOM element not found');
-              setIsLoading(false);
+              console.error('DOM element still not found after retry');
+              // Try to create the element manually
+              const container = document.querySelector('.payment-section');
+              if (container) {
+                const newElement = document.createElement('div');
+                newElement.className = 'primer-checkout-container';
+                container.appendChild(newElement);
+                console.log('Created DOM element manually, retrying...');
+                setTimeout(() => initializePrimerCheckout(), 100);
+              } else {
+                setError('Failed to load Primer SDK - DOM element not found');
+                setIsLoading(false);
+              }
             }
-          }, 500);
+          }, 1000);
         } else {
           setError('Failed to load Primer SDK');
           setIsLoading(false);
