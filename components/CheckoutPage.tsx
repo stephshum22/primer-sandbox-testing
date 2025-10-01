@@ -231,7 +231,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
   return (
     <div className="checkout-page">
       <Script
-        src="https://sdk.primer.io/web/v1.41.1/Primer.min.js"
+        src="https://sdk.primer.io/web/v2.57.3/Primer.min.js"
         strategy="afterInteractive"
         onLoad={() => {
           console.log('Primer SDK loaded successfully');

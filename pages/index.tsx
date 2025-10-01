@@ -10,6 +10,7 @@ export default function Home() {
         <meta name="description" content="Test Primer payments with our beautiful product store" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="stylesheet" href="https://sdk.primer.io/web/v2.57.3/Checkout.css" />
       </Head>
       <main>
         <ProductPage />
