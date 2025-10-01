@@ -226,6 +226,8 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
     );
   }
 
+  console.log('CheckoutPage rendering with:', { isClient, primerLoaded, clientToken, isLoading, error });
+
   return (
     <div className="checkout-page">
       <Script
@@ -283,6 +285,13 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
                   <p>Loading Primer checkout...</p>
                 </div>
               )}
+            </div>
+            <div style={{marginTop: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '5px'}}>
+              <strong>Debug Info:</strong><br/>
+              isClient: {isClient ? 'true' : 'false'}<br/>
+              primerLoaded: {primerLoaded ? 'true' : 'false'}<br/>
+              clientToken: {clientToken ? 'present' : 'missing'}<br/>
+              isLoading: {isLoading ? 'true' : 'false'}
             </div>
           </div>
         </div>
