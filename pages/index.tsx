@@ -1,18 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
-import CheckoutPage from '../components/CheckoutPage';
+import ProductPage from '../components/ProductPage';
 
 export default function Home() {
   return (
     <>
       <Head>
-        <title>Primer Checkout Sandbox</title>
-        <meta name="description" content="Primer sandbox checkout implementation" />
+        <title>Primer Checkout Sandbox - Product Store</title>
+        <meta name="description" content="Test Primer payments with our beautiful product store" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <CheckoutPage />
+        <ProductPage />
       </main>
     </>
   );

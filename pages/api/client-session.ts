@@ -40,14 +40,6 @@ export default async function handler(
             },
           ],
         },
-        // Configure payment methods for sandbox
-        paymentMethod: {
-          options: {
-            card: {
-              threeDSecure: true,
-            },
-          },
-        },
       },
       {
         headers: {
