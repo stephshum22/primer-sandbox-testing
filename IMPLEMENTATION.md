@@ -30,11 +30,12 @@ This project demonstrates a production-ready implementation of Primer's Universa
 
 - **Headless payment orchestration** using Primer's Drop-in Checkout
 - **Multi-currency support** (6 currencies: USD, EUR, GBP, CAD, AUD, JPY)
+- **Multi-processor routing** via Primer Workflows (AUD → Stripe, Others → Primer Test Processor)
 - **Multiple payment methods** (Cards, Apple Pay, PayPal, Klarna)
 - **Modern tech stack** (Next.js 14, React 18, TypeScript, Vercel)
 - **Production-grade practices** (error handling, TypeScript types, client-side rendering)
 
-**Key Result:** A fully functional, currency-aware checkout flow that processes payments through Primer's sandbox environment with a beautiful, user-friendly interface.
+**Key Result:** A fully functional, currency-aware checkout flow that intelligently routes payments to different processors based on currency, demonstrating Primer's orchestration capabilities.
 
 ---
 
@@ -855,26 +856,33 @@ Some third-party SDKs have CORS restrictions that only allow HTTPS origins. Deve
    - Client session management
    - Multiple payment methods (cards, Apple Pay, PayPal, Klarna)
 
-2. **Multi-Currency Support**
+2. **Multi-Processor Payment Routing**
+   - Configured Primer Workflows to route payments based on currency
+   - **Australian transactions (AUD)** → Routed to **Stripe**
+   - **Rest of World (non-AUD)** → Routed to **Primer Test Processor**
+   - Demonstrates Primer's payment orchestration capabilities
+   - Simulates real-world scenario: Australian merchant expanding globally
+
+3. **Multi-Currency Support**
    - 6 currencies: USD, EUR, GBP, CAD, AUD, JPY
    - Real-time currency conversion
    - Proper formatting (including JPY without decimals)
    - Currency passed to Primer API
 
-3. **E-commerce Storefront**
+4. **E-commerce Storefront**
    - Product catalog with 4 demo products
    - Shopping cart with quantity management
    - Cart persistence during session
    - Add/remove items
    - Cart summary with totals
 
-4. **Responsive Design**
+5. **Responsive Design**
    - Mobile-friendly layout
    - Beautiful gradient header
    - Card-based product display
    - Sidebar cart on desktop
 
-5. **Error Handling**
+6. **Error Handling**
    - Client session creation errors
    - SDK loading failures
    - Payment failures
