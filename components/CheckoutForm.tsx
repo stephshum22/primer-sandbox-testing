@@ -65,7 +65,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof CheckoutData],
+          ...(prev[parent as keyof CheckoutData] as object),
           [child]: value,
         },
       }));
