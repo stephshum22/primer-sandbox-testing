@@ -150,6 +150,7 @@ const ProductPage: React.FC = () => {
         totalPrice={getTotalPrice()}
         checkoutData={checkoutData}
         onBackToProducts={handleBackToProducts}
+        currencyCode={selectedCurrency}
       />
     );
   }

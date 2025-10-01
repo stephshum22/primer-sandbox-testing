@@ -25,14 +25,33 @@ interface CheckoutPageProps {
   totalPrice: number;
   checkoutData: any;
   onBackToProducts: () => void;
+  currencyCode: string;
 }
 
-const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutData, onBackToProducts }) => {
+const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutData, onBackToProducts, currencyCode }) => {
   const [clientToken, setClientToken] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
   const [primerLoaded, setPrimerLoaded] = useState(false);
+
+  // Currency symbols
+  const currencySymbols: { [key: string]: string } = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'CAD': 'C$',
+    'AUD': 'A$',
+    'JPY': '¥',
+  };
+
+  const formatPrice = (price: number) => {
+    const symbol = currencySymbols[currencyCode] || '$';
+    if (currencyCode === 'JPY') {
+      return `${symbol}${Math.round(price)}`; // No decimals for JPY
+    }
+    return `${symbol}${price.toFixed(2)}`;
+  };
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -213,14 +232,14 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
                     </div>
                   </div>
                   <span className="item-price">
-                    ${(item.product.price * item.quantity).toFixed(2)}
+                    {formatPrice(item.product.price * item.quantity)}
                   </span>
                 </div>
               ))}
             </div>
             <div className="order-total">
               <span>Total</span>
-              <span>${totalPrice.toFixed(2)}</span>
+              <span>{formatPrice(totalPrice)}</span>
             </div>
           </div>
 
