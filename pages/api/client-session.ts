@@ -25,7 +25,7 @@ export default async function handler(
       });
     }
 
-    // Correct request format based on Primer docs
+    // Complete request format with billing address and customer info
     const requestBody = {
       orderId,
       currencyCode,
@@ -39,6 +39,27 @@ export default async function handler(
             quantity: 1,
           },
         ],
+        countryCode: 'US',
+        fees: [],
+      },
+      customer: {
+        firstName: 'John',
+        lastName: 'Doe',
+        emailAddress: 'test@example.com',
+        mobileNumber: '+1234567890',
+        billingAddress: {
+          firstName: 'John',
+          lastName: 'Doe',
+          addressLine1: '123 Main St',
+          city: 'San Francisco',
+          state: 'CA',
+          zipCode: '94105',
+          countryCode: 'US',
+        },
+      },
+      metadata: {
+        source: 'sandbox-testing',
+        environment: 'development',
       },
     };
 

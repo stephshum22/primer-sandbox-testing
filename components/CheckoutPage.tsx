@@ -85,7 +85,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
     initializePrimerCheckout();
   }, [isClient, primerLoaded, clientToken]);
 
-  // Get client token
+  // Get client token and load SDK
   useEffect(() => {
     if (!isClient) return;
     
@@ -94,6 +94,27 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
         const token = await fetchClientToken();
         setClientToken(token);
         console.log('Client token obtained:', token.substring(0, 20) + '...');
+        
+        // If Script component didn't load SDK, try manual loading
+        setTimeout(() => {
+          if (!window.Primer) {
+            console.log('Script component failed, trying manual SDK loading...');
+            const script = document.createElement('script');
+            script.src = 'https://sdk.primer.io/web/v1.41.1/Primer.min.js';
+            script.async = true;
+            script.onload = () => {
+              console.log('Manual SDK loading successful');
+              setPrimerLoaded(true);
+            };
+            script.onerror = () => {
+              console.error('Manual SDK loading failed');
+              setError('Failed to load Primer SDK');
+              setIsLoading(false);
+            };
+            document.head.appendChild(script);
+          }
+        }, 2000); // Wait 2 seconds for Script component
+        
       } catch (err) {
         console.error('Failed to get client token:', err);
         setError('Failed to initialize checkout');
