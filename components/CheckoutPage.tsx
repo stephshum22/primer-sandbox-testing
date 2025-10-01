@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Script from 'next/script';
 
 // Declare Primer global
@@ -33,7 +33,6 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
   const [error, setError] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
   const [primerLoaded, setPrimerLoaded] = useState(false);
-  const primerRef = useRef<HTMLDivElement>(null);
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -47,13 +46,16 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
     const initializePrimerCheckout = () => {
       console.log('Initializing Primer checkout...');
       console.log('Window.Primer available:', !!window.Primer);
-      console.log('PrimerRef current:', !!primerRef.current);
       
-      if (window.Primer && primerRef.current) {
+      // Use document.querySelector instead of ref for more reliable DOM access
+      const container = document.querySelector('.primer-checkout-container');
+      console.log('Container element found:', !!container);
+      
+      if (window.Primer && container) {
         try {
           window.Primer.showUniversalCheckout({
             clientToken: clientToken,
-            container: primerRef.current,
+            container: container,
             onCheckoutComplete: handlePaymentSuccess,
             onCheckoutError: handlePaymentError,
             appearance: {
@@ -76,35 +78,23 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
       } else {
         console.error('Missing requirements for Primer checkout:', {
           windowPrimer: !!window.Primer,
-          primerRef: !!primerRef.current
+          container: !!container
         });
         
         // Wait a bit and try again if DOM element isn't ready
-        if (window.Primer && !primerRef.current) {
+        if (window.Primer && !container) {
           console.log('DOM element not ready, retrying in 1000ms...');
           setTimeout(() => {
-            // Check if element exists in DOM
-            const element = document.querySelector('.primer-checkout-container');
-            console.log('DOM element found:', !!element);
-            console.log('PrimerRef current:', !!primerRef.current);
+            const retryContainer = document.querySelector('.primer-checkout-container');
+            console.log('Retry - Container element found:', !!retryContainer);
             
-            if (primerRef.current || element) {
+            if (retryContainer) {
               console.log('DOM element found on retry, initializing...');
               initializePrimerCheckout();
             } else {
               console.error('DOM element still not found after retry');
-              // Try to create the element manually
-              const container = document.querySelector('.payment-section');
-              if (container) {
-                const newElement = document.createElement('div');
-                newElement.className = 'primer-checkout-container';
-                container.appendChild(newElement);
-                console.log('Created DOM element manually, retrying...');
-                setTimeout(() => initializePrimerCheckout(), 100);
-              } else {
-                setError('Failed to load Primer SDK - DOM element not found');
-                setIsLoading(false);
-              }
+              setError('Failed to load Primer SDK - DOM element not found');
+              setIsLoading(false);
             }
           }, 1000);
         } else {
@@ -279,7 +269,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, checkoutD
 
           <div className="payment-section">
             <h3>Payment Details</h3>
-            <div ref={primerRef} className="primer-checkout-container">
+            <div className="primer-checkout-container">
               {isLoading && (
                 <div className="payment-loading">
                   <p>Loading Primer checkout...</p>
