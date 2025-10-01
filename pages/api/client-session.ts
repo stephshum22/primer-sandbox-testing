@@ -25,12 +25,13 @@ export default async function handler(
       });
     }
 
-    // Simplified request format - let Primer handle billing address collection
+    // Complete request format based on Primer API docs
     const requestBody = {
       orderId,
       currencyCode,
       amount: amount,
       order: {
+        countryCode: 'US',
         lineItems: [
           {
             itemId: 'test-item',
@@ -39,6 +40,13 @@ export default async function handler(
             quantity: 1,
           },
         ],
+      },
+      customer: {
+        emailAddress: 'test@example.com',
+      },
+      metadata: {
+        source: 'sandbox-testing',
+        environment: 'development',
       },
     };
 

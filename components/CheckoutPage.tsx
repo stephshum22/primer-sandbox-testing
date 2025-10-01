@@ -77,8 +77,22 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ cart, totalPrice, onBackToP
           windowPrimer: !!window.Primer,
           primerRef: !!primerRef.current
         });
-        setError('Failed to load Primer SDK');
-        setIsLoading(false);
+        
+        // Wait a bit and try again if DOM element isn't ready
+        if (window.Primer && !primerRef.current) {
+          console.log('DOM element not ready, retrying in 500ms...');
+          setTimeout(() => {
+            if (primerRef.current) {
+              initializePrimerCheckout();
+            } else {
+              setError('Failed to load Primer SDK - DOM element not found');
+              setIsLoading(false);
+            }
+          }, 500);
+        } else {
+          setError('Failed to load Primer SDK');
+          setIsLoading(false);
+        }
       }
     };
 
